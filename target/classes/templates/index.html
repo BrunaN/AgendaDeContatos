@@ -1,12 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title of the document</title>
+    <meta charset="UTF-8"/>
+    <title>Auto Estudo</title>
+    <script src="https://unpkg.com/vue"></script>
+
+    <style>
+        *{
+            font-family: sans-serif;
+        }
+    </style>
+
 </head>
 
 <body>
 
+    <header>
+        <h1>
+            Agenda de contatos
+        </h1>
+    </header>
+
+    <div class="container">
+
+        <div id="app" class="add-contact">
+            <form>
+                <input v-model="name" placeholder="Nome" type="text"/>
+                <input v-model="email" placeholder="Email" type="email"/>
+                <input v-model="number" placeholder="Número" type="text"/>
+            </form>
+
+            <div>
+                <h3>
+                    Preview
+                </h3>
+                <div>
+                    {{ name }} {{ email }} {{ number }}
+                </div>
+                <button v-on:click="submit">Enviar</button>
+            </div>
+        </div>
+
+        <div class="contacts">
+            <ul>
+                <li>
+                    <div class="contact">
+                        <div>
+                            Bruna Neves de Oliveira
+                        </div>
+                        <div>
+                            brubsnev@gmail.com
+                        </div>
+                        <div>
+                            997305510
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+
+        var app = new Vue({
+            el: '#app',
+
+            data: {
+                name: '',
+                email: '',
+                number: ''
+            },
+
+            methods:{
+                submit : function(event){
+                    alert(this.name)
+
+                    this.$http.post('http://localhost:8080/contacts', {
+                        "name": this.name,
+                        "email": this.email,
+                        "number": this.number
+                    }).then((response) => {
+                        console.log("entrou aqui");
+                    }, (response) => {
+
+                    })
+                }
+            }
+        })
+
+    </script>
 </body>
 
 </html>
