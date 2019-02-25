@@ -1,14 +1,62 @@
 <!DOCTYPE html>
-<html xmlns:v-on="http://www.w3.org/1999/xhtml">
+<html xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-for="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8"/>
     <title>Auto Estudo</title>
-    <script src="https://unpkg.com/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous"/>
 
     <style>
         *{
             font-family: sans-serif;
         }
+
+        header h1{
+            font-size: 25px;
+        }
+
+        .add{
+            border-bottom: 2px solid black;
+            padding: 5px;
+            margin: 5px;
+            padding-bottom: 20px;
+        }
+
+        .add-contact h3{
+            font-size: 20px;
+        }
+
+        .preview{
+            margin: 5px;
+            padding: 5px;
+        }
+
+        .contact{
+            border: 1px solid #ccc;
+            padding: 6px;
+            margin-bottom: 5px;
+            width: 50%;
+        }
+
+        .contact .infos{
+            display: inline-block;
+        }
+
+        .contact .edit input{
+            display: block;
+        }
+
+        .contact .icons{
+            float: right;
+            background-color: none;
+        }
+
+        .contact .icons-edit{
+            margin: 10px 0;
+        }
+
     </style>
 
 </head>
@@ -21,16 +69,29 @@
         </h1>
     </header>
 
-    <div class="container">
+    <div id="app" class="container">
 
-        <div id="app" class="add-contact">
-            <form>
-                <input v-model="name" placeholder="Nome" type="text"/>
-                <input v-model="email" placeholder="Email" type="email"/>
-                <input v-model="number" placeholder="Número" type="text"/>
-            </form>
+        <div class="add-contact">
 
-            <div>
+            <div class="add">
+                <h2>
+                    Adicionar contato
+                </h2>
+
+                <form>
+                    <input v-model="name" placeholder="Nome" type="text"/>
+                    <input v-model="email" placeholder="Email" type="text"/>
+                    <input v-model="number" placeholder="Número" type="text"/>
+                </form>
+            </div>
+
+            <div v-if="submitted">
+                <h3>
+                    Contato cadastrado com sucesso!
+                </h3>
+            </div>
+
+            <div class="preview">
                 <h3>
                     Preview
                 </h3>
@@ -39,24 +100,53 @@
                 </div>
                 <button v-on:click="submit">Enviar</button>
             </div>
+
         </div>
 
-        <div class="contacts">
-            <ul>
-                <li>
-                    <div class="contact">
-                        <div>
-                            Bruna Neves de Oliveira
-                        </div>
-                        <div>
-                            brubsnev@gmail.com
-                        </div>
-                        <div>
-                            997305510
-                        </div>
-                    </div>
-                </li>
-            </ul>
+        <div v-for="contact in contacts" class="contacts">
+
+            <div class="contact">
+
+                <div v-if="!editted" class="infos">
+                    <h3>
+                        {{ contact.name }}
+                    </h3>
+                    <p>
+                        {{ contact.email }}
+                    </p>
+                    <h3>
+                        {{ contact.number }}
+                    </h3>
+                </div>
+
+                <div v-if="editted" class="edit">
+                    <form>
+                        <input v-model="contact.name" type="text"/>
+                        <input v-model="contact.email" type="email"/>
+                        <input v-model="contact.number" type="text"/>
+                    </form>
+                </div>
+
+                <div v-if="!editted" class="icons">
+                    <button v-on:click="remove(contact)">
+                        <i class="far fa-trash-alt"></i>
+                    </button>
+                    <button v-on:click="edit">
+                        <i class="far fa-edit"></i>
+                    </button>
+                </div>
+
+                <div v-if="editted" class="icons-edit">
+                    <button v-on:click="save(contact)">
+                        Alterar contato
+                    </button>
+                    <button v-on:click="cancel">
+                        Cancelar
+                    </button>
+                </div>
+
+            </div>
+
         </div>
 
     </div>
@@ -64,29 +154,70 @@
     <script>
 
         var app = new Vue({
+
             el: '#app',
 
             data: {
                 name: '',
                 email: '',
-                number: ''
+                number: '',
+
+                submitted: false,
+                editted: false,
+
+                contacts: []
             },
 
             methods:{
+
                 submit : function(event){
-                    alert(this.name)
-
+                    //alert(this.name)
                     this.$http.post('http://localhost:8080/contacts', {
-                        "nome" : this.name,
-                        "email":this.email,
-                        "number_phone":this.number
-                    }).then((response) => {
-                        console.log("entrou aqui");
-                    }, (response) => {
-
+                        "name" : this.name,
+                        "email": this.email,
+                        "number": this.number
+                    }).then(function(res){
+                        this.submitted = true;
+                        this.name = ""
+                        this.email = ""
+                        this.number = ""
+                        //this.contacts.push(res)
+                        console.log(res);
                     })
+                },
+
+                remove : function (contact) {
+                    this.$http.delete('http://localhost:8080/contact' + "/"+ contact.id).then(function(data){
+                        this.contacts.splice(contact,1);
+                        console.log(data);
+                    })
+                },
+
+                edit : function () {
+                    this.editted = true;
+                },
+
+                save : function (contact){
+                    this.$http.put('http://localhost:8080/contact' + "/"+ contact.id, {
+
+                    }).then(function(data){
+                        console.log(data);
+                    })
+                },
+
+                cancel : function () {
+                    this.editted = false;
                 }
+
+            },
+
+            created() {
+                this.$http.get('http://localhost:8080/contacts').then(function(data){
+                    this.contacts = data.body;
+                    console.log(this.contacts);
+                })
             }
+
         })
 
     </script>
