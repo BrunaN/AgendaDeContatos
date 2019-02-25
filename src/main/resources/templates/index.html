@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8"/>
     <title>Auto Estudo</title>
@@ -76,7 +76,11 @@
                 submit : function(event){
                     alert(this.name)
 
-                    this.$http.post('http://localhost:8080/contacts', ).then((response) => {
+                    this.$http.post('http://localhost:8080/contacts', {
+                        "nome" : this.name,
+                        "email":this.email,
+                        "number_phone":this.number
+                    }).then((response) => {
                         console.log("entrou aqui");
                     }, (response) => {
 
