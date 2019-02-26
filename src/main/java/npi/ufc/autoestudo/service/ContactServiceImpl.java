@@ -1,14 +1,11 @@
 package npi.ufc.autoestudo.service;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
 import npi.ufc.autoestudo.dao.ContactRepository;
 import npi.ufc.autoestudo.model.Contact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class ContactServiceImpl implements ContactService {
@@ -17,8 +14,8 @@ public class ContactServiceImpl implements ContactService {
     private ContactRepository contactRepository;
 
     @Override
-    public void createContact(Contact contact) {
-        contactRepository.save(contact);
+    public Contact createContact(Contact contact) {
+        return contactRepository.save(contact);
     }
 
     @Override

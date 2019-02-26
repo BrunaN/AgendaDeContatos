@@ -23,9 +23,8 @@ public class ContactServiceController {
 
     @RequestMapping(value="/contacts", method = RequestMethod.POST)
     public ResponseEntity<Object> createContact(@RequestBody Contact contact){
-        contactService.createContact(contact);
-
-        return new ResponseEntity<>("contato criado com sucesso", HttpStatus.CREATED);
+        Contact contato = contactService.createContact(contact);
+        return ResponseEntity.status(HttpStatus.CREATED).body(contato);
     }
 
     @RequestMapping(value="contact/{id}", method=RequestMethod.PUT)

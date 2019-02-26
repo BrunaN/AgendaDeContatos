@@ -9,35 +9,103 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous"/>
 
     <style>
+
         *{
             font-family: sans-serif;
         }
 
         header h1{
             font-size: 25px;
+            padding: 0;
+            padding-left: 25px;
+            margin-top: 25px;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        input{
+            border: 1px solid #ccc;
+            font-size: 16px;
+            padding: 5px;
+            border-radius: 4px;
+            margin-bottom: 5px;
         }
 
         .add{
-            border-bottom: 2px solid black;
             padding: 5px;
+            padding-bottom: 0px;
+            padding-left: 20px;
             margin: 5px;
-            padding-bottom: 20px;
+            margin-bottom: 0px;
         }
 
-        .add-contact h3{
+        .add h2{
             font-size: 20px;
+            font-weight: normal;
+            padding: 0;
+            margin: 0;
+            margin-bottom: 5px;
         }
 
         .preview{
             margin: 5px;
+            margin-top: 0px;
+            margin-bottom: 10px;
             padding: 5px;
+            padding-left: 20px;
+        }
+
+        .preview h3{
+            padding: 0;
+            margin: 0;
+            color: #aaa;
+            color: dimgrey;
+            font-size: 18px;
+            font-weight: normal;
+        }
+
+        .preview button{
+            background-color: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 7px 9px;
+        }
+
+        .preview button:hover{
+            color: deeppink;
+        }
+
+        .contacts{
+            margin-top: 20px;
+            padding-left: 25px;
         }
 
         .contact{
-            border: 1px solid #ccc;
+            border: 1px solid #aaa;
+            border-radius: 6px;
             padding: 6px;
-            margin-bottom: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-bottom: 7px;
+            margin-top: 5px;
             width: 50%;
+        }
+
+        .contact h3{
+            font-size: 18px;
+            font-weight: normal;
+            padding: 0;
+            padding-top: 7px;
+            margin: 0;
+        }
+
+        .contact p{
+            font-size: 14px;
+            font-style: italic;
+            color: dimgrey;
+            padding: 0;
+            margin: 0;
+            margin-bottom: 4px;
         }
 
         .contact .infos{
@@ -53,8 +121,29 @@
             background-color: none;
         }
 
+        .contact .icons button{
+            background-color: none;
+            border: none;
+            padding: 6px;
+        }
+
+        .contact .icons button:hover{
+            color: deeppink;
+        }
+
         .contact .icons-edit{
             margin: 10px 0;
+        }
+
+        .contact .icons-edit button{
+            background-color: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 7px 9px;
+        }
+
+        .contact .icons-edit button:hover{
+            color: deeppink;
         }
 
     </style>
@@ -95,64 +184,39 @@
                 <h3>
                     Preview
                 </h3>
-                <div>
-                    {{ name }} {{ email }} {{ number }}
+                <div class="contact">
+                    <div class="infos">
+                        <h3>
+                            Nome: {{ name }}
+                        </h3>
+                        <p>
+                            email: {{ email }}
+                        </p>
+                        <h3>
+                            Telefone: {{ number }}
+                        </h3>
+                    </div>
                 </div>
                 <button v-on:click="submit">Enviar</button>
             </div>
 
         </div>
 
-        <div v-for="contact in contacts" class="contacts">
+        <div class="contacts">
 
-            <div class="contact">
+            <contact-component
+                    v-for="contact in contacts"
+                    v-bind:contact="contact"
+                    v-on:contact-remove="remove"
+                    v-on:contact-save="save">
 
-                <div v-if="!editted" class="infos">
-                    <h3>
-                        {{ contact.name }}
-                    </h3>
-                    <p>
-                        {{ contact.email }}
-                    </p>
-                    <h3>
-                        {{ contact.number }}
-                    </h3>
-                </div>
-
-                <div v-if="editted" class="edit">
-                    <form>
-                        <input v-model="contact.name" type="text"/>
-                        <input v-model="contact.email" type="email"/>
-                        <input v-model="contact.number" type="text"/>
-                    </form>
-                </div>
-
-                <div v-if="!editted" class="icons">
-                    <button v-on:click="remove(contact)">
-                        <i class="far fa-trash-alt"></i>
-                    </button>
-                    <button v-on:click="edit">
-                        <i class="far fa-edit"></i>
-                    </button>
-                </div>
-
-                <div v-if="editted" class="icons-edit">
-                    <button v-on:click="save(contact)">
-                        Alterar contato
-                    </button>
-                    <button v-on:click="cancel">
-                        Cancelar
-                    </button>
-                </div>
-
-            </div>
+            </contact-component>
 
         </div>
 
     </div>
 
     <script>
-
         var app = new Vue({
 
             el: '#app',
@@ -163,7 +227,6 @@
                 number: '',
 
                 submitted: false,
-                editted: false,
 
                 contacts: []
             },
@@ -177,6 +240,7 @@
                         "email": this.email,
                         "number": this.number
                     }).then(function(res){
+                        this.contacts.push(res.body);
                         this.submitted = true;
                         this.name = ""
                         this.email = ""
@@ -193,20 +257,9 @@
                     })
                 },
 
-                edit : function () {
-                    this.editted = true;
-                },
-
                 save : function (contact){
-                    this.$http.put('http://localhost:8080/contact' + "/"+ contact.id, {
-
-                    }).then(function(data){
-                        console.log(data);
+                    this.$http.put('http://localhost:8080/contact' + "/"+ contact.id, contact).then(function(res){
                     })
-                },
-
-                cancel : function () {
-                    this.editted = false;
                 }
 
             },
@@ -218,7 +271,77 @@
                 })
             }
 
-        })
+        });
+
+        Vue.component('contact-component', {
+
+            props: ['contact'],
+
+            data: function () {
+                return {
+                    editted: false
+                }
+            },
+
+            template: `
+                <div class="contact">
+                    <div v-if="!editted" class="infos">
+                        <h3>
+                            {{ contact.name }}
+                        </h3>
+                        <p>
+                            {{ contact.email }}
+                        </p>
+                        <h3>
+                            {{ contact.number }}
+                        </h3>
+                    </div>
+
+                    <div v-if="editted" class="edit">
+                        <form>
+                            <input v-model="contact.name" type="text"/>
+                            <input v-model="contact.email" type="text"/>
+                            <input v-model="contact.number" type="text"/>
+                        </form>
+                    </div>
+
+                    <div v-if="!editted" class="icons">
+                        <button v-on:click="$emit('contact-remove', contact)">
+                            <i class="far fa-trash-alt"></i>
+                        </button>
+                        <button v-on:click="edit">
+                            <i class="far fa-edit"></i>
+                        </button>
+                    </div>
+
+                    <div v-if="editted" class="icons-edit">
+                        <button v-on:click="$emit('contact-save', contact)">
+                            Alterar contato
+                        </button>
+                        <button v-on:click="cancel">
+                            Cancelar
+                        </button>
+                    </div>
+
+
+                </div>
+            `,
+
+            methods: {
+
+                edit : function () {
+                    this.editted = true;
+                },
+
+                cancel : function () {
+                    this.editted = false;
+                }
+
+            }
+
+        });
+
+
 
     </script>
 </body>

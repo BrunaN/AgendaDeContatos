@@ -8,7 +8,7 @@ import java.util.Collection;
 @Service
 public interface ContactService {
 
-    public abstract void createContact(Contact contact);
+    public abstract Contact createContact(Contact contact);
 
     public abstract void updateContact(Long id, Contact contact);
 
